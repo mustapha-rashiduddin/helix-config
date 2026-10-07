@@ -1,0 +1,38 @@
+theme = "amberwood"
+
+# Per-file cursor position memory across editor sessions.
+#
+# Helix has no built-in equivalent of Neovim's viminfo, so the position is
+# stored by a small helper script and replayed on open by the hx() wrapper
+# script in ~/bin.
+#
+# `save` goes through :pipe-to rather than :sh on purpose: :sh spawns a
+# fire-and-forget tokio job that the editor drops on exit, so the write can be
+# silently lost. :pipe-to blocks until the child has finished.
+#
+# %{buffer_name} is single-quoted because the command line is word-split and a
+# path containing spaces would otherwise arrive as several arguments.
+#
+# Positions live in $XDG_STATE_HOME/helix/positions, one file per source file.
+
+[keys.normal]
+# Save position, then quit.
+"q" = [":pipe-to ~/.config/helix/hx-pos.sh save '%{buffer_name}' %{cursor_line} %{cursor_column}", ":q"]
+"S-q" = [":pipe-to ~/.config/helix/hx-pos.sh save '%{buffer_name}' %{cursor_line} %{cursor_column}", ":q!"]
+# Save position, then write and quit.
+"x" = [":pipe-to ~/.config/helix/hx-pos.sh save '%{buffer_name}' %{cursor_line} %{cursor_column}", ":wq"]
+"X" = [":pipe-to ~/.config/helix/hx-pos.sh save '%{buffer_name}' %{cursor_line} %{cursor_column}", ":wq!"]
+"Q" = [":pipe-to ~/.config/helix/hx-pos.sh save '%{buffer_name}' %{cursor_line} %{cursor_column}", ":wqa"]
+"S-Q" = [":pipe-to ~/.config/helix/hx-pos.sh save '%{buffer_name}' %{cursor_line} %{cursor_column}", ":wqa!"]
+# Closing a window, or all but the current one, can end up quitting too.
+"C-w" = [":pipe-to ~/.config/helix/hx-pos.sh save '%{buffer_name}' %{cursor_line} %{cursor_column}", "wclose"]
+"C-o" = [":pipe-to ~/.config/helix/hx-pos.sh save '%{buffer_name}' %{cursor_line} %{cursor_column}", "wonly"]
+
+# Typing ":q" or ":wq" directly would otherwise skip every binding above, so
+# save the position on the way into the command prompt. Helix only lets
+# normal/insert/select be rebound, so this is the only place to catch it.
+":" = [":pipe-to ~/.config/helix/hx-pos.sh save '%{buffer_name}' %{cursor_line} %{cursor_column}", "command_mode"]
+
+# Save the position without quitting (useful before :bc, or to checkpoint a
+# spot while editing).
+"Z" = ":pipe-to ~/.config/helix/hx-pos.sh save '%{buffer_name}' %{cursor_line} %{cursor_column}"
