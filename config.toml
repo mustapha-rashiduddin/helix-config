@@ -15,6 +15,10 @@ theme = "amberwood"
 #
 # Positions live in $XDG_STATE_HOME/helix/positions, one file per source file.
 
+[editor]
+# Show line numbers relative to the cursor line, which stays absolute.
+line-number = "relative"
+
 [keys.normal]
 # Quitting is deliberately NOT bound to bare keys. x/X are
 # extend_line_below/extend_to_line_bounds (selecting a whole line) and Q is
