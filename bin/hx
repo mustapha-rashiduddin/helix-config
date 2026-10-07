@@ -1,0 +1,61 @@
+#!/bin/sh
+# hx - thin wrapper around Helix that restores the last cursor position.
+#
+# Helix itself has no viminfo-style position memory, so positions are written
+# to disk by ~/.config/helix/hx-pos.sh (driven from config.toml keybindings)
+# and read back here when a file is opened.
+#
+# A remembered position is only applied to an argument that names an existing
+# file verbatim. Flags, directories, and anything already carrying an explicit
+# ":line[:col]" are passed through untouched, so "hx f.rs:120" still wins.
+
+# Find the real hx, skipping this wrapper's own directory so a stale copy can
+# never recurse into itself.
+self_dir=${0%/*}
+hx_real=
+IFS=:
+for dir in $PATH; do
+    [ -n "$dir" ] || dir=.
+    case $dir in
+    "$self_dir") continue ;;
+    esac
+    if [ -x "$dir/hx" ]; then
+        hx_real=$dir/hx
+        break
+    fi
+done
+unset IFS
+
+pos_helper="$HOME/.config/helix/hx-pos.sh"
+
+if [ -z "$hx_real" ] || [ ! -r "$pos_helper" ]; then
+    exec "${hx_real:-hx}" "$@"
+fi
+
+# Walk the arguments, shifting each off the front and appending the (possibly
+# rewritten) value to the end. After n iterations nothing is left but the new
+# arguments, in order.
+count=$#
+while [ "$count" -gt 0 ]; do
+    arg=$1
+    shift
+
+    new=$arg
+    case $arg in
+    -* | *:* | *[!A-Za-z0-9_./~+-]*)
+        # A flag, an explicit ":line[:col]", or a path with unusual characters
+        # that could be misread as a position.
+        ;;
+    *)
+        if [ -f "$arg" ]; then
+            pos=$("$pos_helper" load "$arg") || pos=
+            [ -n "$pos" ] && new="$arg:$pos"
+        fi
+        ;;
+    esac
+
+    set -- "$@" "$new"
+    count=$((count - 1))
+done
+
+exec "$hx_real" "$@"
