@@ -37,12 +37,20 @@ theme = "amberwood"
 # spot while editing).
 "Z" = ":pipe-to ~/.config/helix/hx-pos.sh save '%{buffer_name}' %{cursor_line} %{cursor_column}"
 
-# Switch theme live (acme is light, amberwood dark). hx-theme.sh rewrites the
-# theme line in config.toml too, so the choice survives a restart and matches
-# what `light`/`dark` do from a shell.
+# Switch theme live: C-l light, C-k dark (acme and amberwood).
 #
-# Two bindings rather than one toggle: :theme needs the name as a literal and
-# there is no way to capture one command's output into the next command's
-# arguments, so a toggle could not know which name to apply live.
-"C-l" = [":pipe-to ~/.config/helix/hx-theme.sh light", ":theme acme"]
-"C-d" = [":pipe-to ~/.config/helix/hx-theme.sh dark", ":theme amberwood"]
+# C-l and C-k are Helix defaults (jump_view_right / jump_view_up); user
+# bindings take precedence, so these deliberately override them.
+#
+# These call the same config-manager/theme.sh that the `light`/`dark` shell
+# aliases call, so the theme propagates in both directions - from a terminal
+# into Helix via SIGUSR1, and from Helix back out to st, Neovim, Emacs and
+# Chrome. theme.sh rewrites this file's theme line and signals every running
+# hx, including this one, so it repaints via the reload rather than needing
+# an explicit :theme here.
+#
+# Not :light / :dark as typable commands: Helix 25.07 has no user-defined
+# commands (config.toml accepts only theme/keys/editor, with
+# deny_unknown_fields), so keybindings are the only hook available.
+"C-l" = ":pipe-to ~/.config/config-manager/theme.sh light"
+"C-k" = ":pipe-to ~/.config/config-manager/theme.sh dark"
