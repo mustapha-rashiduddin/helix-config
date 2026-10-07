@@ -16,22 +16,20 @@ theme = "amberwood"
 # Positions live in $XDG_STATE_HOME/helix/positions, one file per source file.
 
 [keys.normal]
-# Save position, then quit.
-"q" = [":pipe-to ~/.config/helix/hx-pos.sh save '%{buffer_name}' %{cursor_line} %{cursor_column}", ":q"]
-"S-q" = [":pipe-to ~/.config/helix/hx-pos.sh save '%{buffer_name}' %{cursor_line} %{cursor_column}", ":q!"]
-# Save position, then write and quit.
-"x" = [":pipe-to ~/.config/helix/hx-pos.sh save '%{buffer_name}' %{cursor_line} %{cursor_column}", ":wq"]
-"X" = [":pipe-to ~/.config/helix/hx-pos.sh save '%{buffer_name}' %{cursor_line} %{cursor_column}", ":wq!"]
-"Q" = [":pipe-to ~/.config/helix/hx-pos.sh save '%{buffer_name}' %{cursor_line} %{cursor_column}", ":wqa"]
-"S-Q" = [":pipe-to ~/.config/helix/hx-pos.sh save '%{buffer_name}' %{cursor_line} %{cursor_column}", ":wqa!"]
-# Closing a window, or all but the current one, can end up quitting too.
-"C-w" = [":pipe-to ~/.config/helix/hx-pos.sh save '%{buffer_name}' %{cursor_line} %{cursor_column}", "wclose"]
-"C-o" = [":pipe-to ~/.config/helix/hx-pos.sh save '%{buffer_name}' %{cursor_line} %{cursor_column}", "wonly"]
-
-# Typing ":q" or ":wq" directly would otherwise skip every binding above, so
-# save the position on the way into the command prompt. Helix only lets
-# normal/insert/select be rebound, so this is the only place to catch it.
+# Quitting is deliberately NOT bound to bare keys. x/X are
+# extend_line_below/extend_to_line_bounds (selecting a whole line) and Q is
+# record_macro; binding those to save-position-then-quit shadowed the defaults
+# and made x quit the editor. :q and :wq need no binding of their own.
 ":" = [":pipe-to ~/.config/helix/hx-pos.sh save '%{buffer_name}' %{cursor_line} %{cursor_column}", "command_mode"]
+
+# :q and :wq are covered above because everything typed at the prompt passes
+# through it. wclose is the one exit that doesn't: C-w q is a keybinding and
+# never enters command mode, so closing the last window that way quits with no
+# position saved. Nested so this adds to the Window minor mode instead of
+# replacing it - C-w stays rotate_view, C-w s/v/t and friends are untouched.
+[keys.normal."C-w"]
+q = [":pipe-to ~/.config/helix/hx-pos.sh save '%{buffer_name}' %{cursor_line} %{cursor_column}", "wclose"]
+"C-q" = [":pipe-to ~/.config/helix/hx-pos.sh save '%{buffer_name}' %{cursor_line} %{cursor_column}", "wclose"]
 
 # Save the position without quitting (useful before :bc, or to checkpoint a
 # spot while editing).
