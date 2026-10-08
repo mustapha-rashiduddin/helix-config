@@ -1,4 +1,4 @@
-theme = "amberwood"
+theme = "modus_operandi"
 
 # Per-file cursor position memory across editor sessions.
 #
@@ -39,7 +39,7 @@ q = [":pipe-to ~/.config/helix/hx-pos.sh save '%{buffer_name}' %{cursor_line} %{
 # spot while editing).
 "Z" = ":pipe-to ~/.config/helix/hx-pos.sh save '%{buffer_name}' %{cursor_line} %{cursor_column}"
 
-# Switch theme live: C-l light, C-k dark (acme and amberwood).
+# Switch theme live: C-l light, C-k dark (modus_operandi and amberwood).
 #
 # C-l and C-k are Helix defaults (jump_view_right / jump_view_up); user
 # bindings take precedence, so these deliberately override them.

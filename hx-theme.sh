@@ -9,7 +9,7 @@
 # The mirror-image half is in theme.sh, which does the same rewrite when you
 # type `light` or `dark` in a shell (that only affects the next launch).
 #
-#   hx-theme.sh light   -> acme
+#   hx-theme.sh light   -> modus_operandi
 #   hx-theme.sh dark    -> amberwood
 #   hx-theme.sh toggle  -> flip to whichever is not currently in config.toml
 #   hx-theme.sh get     -> print the current theme name, nothing else
@@ -20,9 +20,6 @@
 set -u
 
 CONFIG="${HELIX_CONFIG:-$HOME/.config/helix/config.toml}"
-
-light() { printf 'acme\n'; }
-dark() { printf 'amberwood\n'; }
 
 current() {
     [ -r "$CONFIG" ] || return 1
@@ -45,14 +42,14 @@ store() {
 cmd=${1:-get}
 
 case $cmd in
-light) want=acme ;;
+light) want=modus_operandi ;;
 dark) want=amberwood ;;
 toggle)
     was=$(current) || was=amberwood
-    if [ "$was" = acme ]; then
+    if [ "$was" = modus_operandi ]; then
         want=amberwood
     else
-        want=acme
+        want=modus_operandi
     fi
     ;;
 get)
