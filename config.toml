@@ -1,4 +1,4 @@
-theme = "modus_operandi"
+theme = "amberwood"
 
 # Per-file cursor position memory across editor sessions.
 #
@@ -26,15 +26,6 @@ line-number = "relative"
 # and made x quit the editor. :q and :wq need no binding of their own.
 ":" = [":pipe-to ~/.config/helix/hx-pos.sh save '%{buffer_name}' %{cursor_line} %{cursor_column}", "command_mode"]
 
-# :q and :wq are covered above because everything typed at the prompt passes
-# through it. wclose is the one exit that doesn't: C-w q is a keybinding and
-# never enters command mode, so closing the last window that way quits with no
-# position saved. Nested so this adds to the Window minor mode instead of
-# replacing it - C-w stays rotate_view, C-w s/v/t and friends are untouched.
-[keys.normal."C-w"]
-q = [":pipe-to ~/.config/helix/hx-pos.sh save '%{buffer_name}' %{cursor_line} %{cursor_column}", "wclose"]
-"C-q" = [":pipe-to ~/.config/helix/hx-pos.sh save '%{buffer_name}' %{cursor_line} %{cursor_column}", "wclose"]
-
 # Save the position without quitting (useful before :bc, or to checkpoint a
 # spot while editing).
 "Z" = ":pipe-to ~/.config/helix/hx-pos.sh save '%{buffer_name}' %{cursor_line} %{cursor_column}"
@@ -56,3 +47,18 @@ q = [":pipe-to ~/.config/helix/hx-pos.sh save '%{buffer_name}' %{cursor_line} %{
 # deny_unknown_fields), so keybindings are the only hook available.
 "C-l" = ":pipe-to ~/.config/config-manager/theme.sh light"
 "C-k" = ":pipe-to ~/.config/config-manager/theme.sh dark"
+
+# Must stay LAST in this file. TOML table headers change the scope for every
+# bare key that follows, so any key placed after this line would be parsed as
+# a child of [keys.normal."C-w"] and bound as C-w <key> rather than as itself.
+# That is what silently killed C-l, C-k and Z in the first attempt at this.
+#
+# :q and :wq are covered by the : binding above, since everything typed at the
+# prompt passes through it. wclose is the one exit that binding cannot catch:
+# C-w q is a keybinding and never enters command mode, so closing the last
+# window that way quits with no position saved. Nesting adds to the Window
+# minor mode rather than replacing it, so C-w stays rotate_view and C-w s/v/t
+# are untouched.
+[keys.normal."C-w"]
+q = [":pipe-to ~/.config/helix/hx-pos.sh save '%{buffer_name}' %{cursor_line} %{cursor_column}", "wclose"]
+"C-q" = [":pipe-to ~/.config/helix/hx-pos.sh save '%{buffer_name}' %{cursor_line} %{cursor_column}", "wclose"]
